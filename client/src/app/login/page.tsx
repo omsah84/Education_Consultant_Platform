@@ -24,8 +24,8 @@ export default function LoginPage() {
       console.log("Login Result:", result);
 
       if (res.ok) {
-        const { user, accessToken } = result.data;
-        login(user, accessToken); // store in context + localStorage
+        const { user, accessToken, refreshToken } = result.data;
+        login(user, accessToken, refreshToken); // store in context + localStorage
         router.push("/dashboard");
       } else {
         setError(result.message || "Login failed");
@@ -38,7 +38,7 @@ export default function LoginPage() {
   return (
     <div>
       <Header />
-      <div className="min-h-screen flex items-center justify-center bg-black px-4">
+      <div className="min-h-auto flex items-center justify-center bg-black px-4 py-13">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full max-w-md bg-[#1a1a1a] text-white p-8 rounded-xl shadow-xl space-y-6 border border-gray-700"
@@ -82,7 +82,7 @@ export default function LoginPage() {
           </p>
         </form>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }
