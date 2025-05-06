@@ -1,93 +1,126 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/lib/AuthContext';
-import Link from 'next/link';
-import { FiPlus, FiEdit, FiEye } from 'react-icons/fi';
+import { useAuth } from "@/lib/AuthContext";
+import Link from "next/link";
+import { FiPlus, FiEdit, FiEye } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApi } from "@/lib/useApi";
+import Image from "next/image";
 
-const listings = [
-  {
-    id: 1,
-    title: '2BHK Flat in Sector 62',
-    location: 'Noida',
-    rent: 12000,
-    status: 'Active',
-    postedAt: '2025-05-01T10:00:00Z',
-    type: 'Flat',
-    amenities: ['Wi-Fi', 'AC', 'Geyser'],
-    image: '/flat1.jpg',
-  },
-  {
-    id: 2,
-    title: 'Shared Room for Students',
-    location: 'Delhi University',
-    rent: 5000,
-    status: 'Pending',
-    postedAt: '2025-04-28T14:30:00Z',
-    type: 'PG',
-    amenities: ['Wi-Fi', 'Laundry'],
-    image: '/pg1.jpg',
-  },
-];
+// Define the structure for a listing object
+interface Listing {
+  _id: string;
+  type: string;
+  description?: string;
+  providerType: string;
+  streetAddress: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  country: string;
+  image?: string;
+  nearby: string[];
+  createdAt: string;
+}
 
 export default function HostListingsPage() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, isAuthenticated, loading } = useAuth();
+  const api = useApi();
 
+  // Define the state for listings and loading state
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loadingListings, setLoadingListings] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      if (!isAuthenticated) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const response = await api.get("/listproperty/property-listings");
+
+        if (response?.data?.success) {
+          setListings(response.data.data); // assuming controller sends it as `data`
+        } else {
+          setListings([]);
+        }
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          // Not found is a valid state — no listings yet
+          setListings([]);
+        } else {
+          console.error("An unexpected error occurred:", error.message || error);
+        }
+      } finally {
+        setLoadingListings(false);
+      }
+    };
+
+    if (isAuthenticated) fetchListings();
+  }, []);
+
+  if (loading || loadingListings) return <p className="text-white p-6">Loading...</p>;
   if (!user) return <p className="text-white p-6">Loading user...</p>;
 
   return (
     <div className="p-6 text-white">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Listings</h1>
-        <Link
-          href="/dashboard/host/listings/new"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-        >
-          <FiPlus />
-          Add New Listing
-        </Link>
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">Your Listings</h1>
+
+<Link
+  href="/dashboard/host/listings/new"
+  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition text-sm sm:text-base md:text-lg"
+>
+  <FiPlus />
+  Add New Listing
+</Link>
+
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {listings.map((listing) => (
-          <div
-            key={listing.id}
-            className="bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition"
-          >
-            <img
-              src={listing.image}
-              alt={listing.title}
-              className="w-full h-40 object-cover rounded-t-lg"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-semibold mb-1">{listing.title}</h3>
-              <p className="text-gray-400 text-sm mb-2">📍 {listing.location}</p>
-              <p className="text-sm mb-1">💸 Rent: ₹{listing.rent}</p>
-              <p className="text-sm mb-1">🏷️ Type: {listing.type}</p>
-              <p className="text-sm mb-1">
-                🛠️ Amenities: {listing.amenities.join(', ')}
-              </p>
-              <p
-                className={`text-sm mt-1 font-medium ${
-                  listing.status === 'Active'
-                    ? 'text-green-400'
-                    : 'text-yellow-400'
-                }`}
-              >
-                Status: {listing.status}
-              </p>
+      {listings.length === 0 ? (
+        <p className="text-center text-gray-400">No listings found. Add one now!</p>
+      ) : (
+        
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {listings.map((listing) => (
+            <Link key={listing._id} href={`/dashboard/host/rooms/new?listingId=${listing._id}`}>
+            <div  className="bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition" >
+              <div className="relative w-full h-48" >
+                <Image
+                  src={listing.image || "/placeholder-image.jpg"}
+                  alt={listing.description || "Property Image"}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-t-lg"
+                />
+              </div>
 
-              <div className="flex gap-3 mt-4">
-                <button className="text-blue-400 hover:text-blue-300 flex items-center gap-1">
-                  <FiEye /> View
-                </button>
-                <button className="text-yellow-400 hover:text-yellow-300 flex items-center gap-1">
-                  <FiEdit /> Edit
-                </button>
+              <div className="p-4">
+                <h3 className="text-xl font-semibold mb-1">{listing.type}</h3>
+                <p className="text-sm text-gray-400 mb-1">
+                  {listing.description || "No description provided."}
+                </p>
+                <p className="text-sm text-gray-300 mb-1">🏢 Provider: {listing.providerType}</p>
+                <p className="text-sm text-gray-300 mb-1">
+                  📍 {listing.streetAddress}, {listing.city}, {listing.stateProvince}, {listing.postalCode}, {listing.country}
+                </p>
+                <p className="text-sm text-gray-300 mb-1">
+                  🛠️ Nearby: {listing.nearby?.length ? listing.nearby.join(", ") : "No nearby locations listed"}
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  🕒 Listed on: {new Date(listing.createdAt).toLocaleDateString()}
+                </p>
+
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

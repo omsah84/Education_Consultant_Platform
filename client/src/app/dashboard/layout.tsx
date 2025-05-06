@@ -29,6 +29,7 @@ import {
   FiThumbsUp,
   FiCreditCard,
 } from "react-icons/fi";
+import { FaBed } from "react-icons/fa";
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
@@ -170,9 +171,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         icon: <FiBarChart className="text-white text-xl" />,
       },
       {
-        name: "List Rooms/PG/Flats",
+        name: "List House/PG/Flats",
         path: "/dashboard/host/listings",
         icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "List Rooms", // New Rooms section
+        path: "/dashboard/host/rooms",
+        icon: <FaBed className="text-white text-xl" />,
       },
       {
         name: "Verify Ownership",
