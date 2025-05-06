@@ -1,125 +1,187 @@
-'use client';
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import { FiArrowLeft, FiUpload } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { FiArrowLeft, FiUpload } from "react-icons/fi";
+import { useApi } from "@/lib/useApi";
 
 export default function VerifyOwnershipPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const api = useApi();
+  const { accessToken, isAuthenticated, isLoading } = useAuth();
 
   const [form, setForm] = useState({
-    propertyTitle: "",
-    propertyAddress: "",
-    ownerName: "",
-    idProof: null, // for file upload
-    propertyDocument: null, // for file upload
+    phoneNumber: "",
+    state: "",
+    district: "",
+    city: "",
+    verificationDocuments: null as File | null,
   });
 
-  if (!user) return <p className="text-white p-6">Loading user...</p>;
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
+  const [hasExistingVerification, setHasExistingVerification] = useState(false);
 
-  const handleChange = (e: any) => {
+  useEffect(() => {
+    const fetchVerification = async () => {
+
+      try {
+        const res = await api("/owner/owner-verification");
+
+        if (res?.data) {
+          setHasExistingVerification(true);
+          setVerificationStatus(res.data.verificationStatus || "pending");
+        } else {
+          setHasExistingVerification(false);
+        }
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          setHasExistingVerification(false);
+        } else {
+          console.error("Error fetching verification:", err);
+        }
+      }
+    };
+
+    if (isAuthenticated) fetchVerification();
+  }, [accessToken, isAuthenticated]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: any) => {
-    const { name, files } = e.target;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { files } = e.target;
     if (files && files[0]) {
-      setForm((prev) => ({ ...prev, [name]: files[0] }));
+      setForm((prev) => ({ ...prev, verificationDocuments: files[0] }));
     }
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError(null);
 
     const formData = new FormData();
-    formData.append("propertyTitle", form.propertyTitle);
-    formData.append("propertyAddress", form.propertyAddress);
-    formData.append("ownerName", form.ownerName);
-    if (form.idProof) formData.append("idProof", form.idProof);
-    if (form.propertyDocument) formData.append("propertyDocument", form.propertyDocument);
+    formData.append("phoneNumber", form.phoneNumber);
+    formData.append("address[state]", form.state);
+    formData.append("address[district]", form.district);
+    formData.append("address[city]", form.city);
+    if (form.verificationDocuments) {
+      formData.append("verificationDocuments", form.verificationDocuments);
+    }
 
-    // Simulate API request here
-    // Example: await api.post('/verify-ownership', formData);
+    try {
+      
+      const res = await api("/owner/owner-verification", {
+        method: "POST",
+      data: formData,
+      });
 
-    console.log("Submitting verify ownership:", formData);
-    router.push("/dashboard/host");
+      if (res?.data) {
+        setHasExistingVerification(true);
+        setVerificationStatus(res.data.verificationStatus || "pending");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Failed to submit verification");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  if (isLoading || !isAuthenticated) return <p className="text-white">Loading...</p>;
+
   return (
-    <div className="p-6 text-white">
-      <button
-        onClick={() => router.back()}
-        className="text-blue-400 flex items-center gap-2 mb-4"
-      >
+    <div className="p-6 text-white max-w-2xl mx-auto">
+      <button onClick={() => router.back()} className="text-blue-400 flex items-center gap-2 mb-4">
         <FiArrowLeft /> Back
       </button>
 
-      <h1 className="text-2xl font-bold mb-6">Verify Property Ownership</h1>
+      <h1 className="text-2xl font-bold mb-4">Verify Property Ownership</h1>
 
-      <form onSubmit={handleSubmit} className="grid gap-4 max-w-2xl">
-        <input
-          type="text"
-          name="propertyTitle"
-          placeholder="Property Title"
-          value={form.propertyTitle}
-          onChange={handleChange}
-          className="p-3 bg-gray-800 border border-gray-600 rounded text-white"
-          required
-        />
-        <input
-          type="text"
-          name="propertyAddress"
-          placeholder="Property Address"
-          value={form.propertyAddress}
-          onChange={handleChange}
-          className="p-3 bg-gray-800 border border-gray-600 rounded text-white"
-          required
-        />
-        <input
-          type="text"
-          name="ownerName"
-          placeholder="Owner Name"
-          value={form.ownerName}
-          onChange={handleChange}
-          className="p-3 bg-gray-800 border border-gray-600 rounded text-white"
-          required
-        />
-        
-        {/* File Inputs for ID Proof and Property Document */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm">Upload ID Proof</label>
+      {hasExistingVerification ? (
+        <p className="mb-6">
+          <span className="font-semibold">Your verification status: </span>
+          <span
+            className={`inline-block px-3 py-1 rounded text-sm font-medium ${
+              verificationStatus === "approved"
+                ? "bg-green-600"
+                : verificationStatus === "rejected"
+                ? "bg-red-600"
+                : "bg-yellow-600"
+            }`}
+          >
+            {verificationStatus}
+          </span>
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          {error && <p className="text-red-500">{error}</p>}
+
           <input
-            type="file"
-            name="idProof"
-            onChange={handleFileChange}
-            className="p-3 bg-gray-800 border border-gray-600 rounded text-white"
+            type="text"
+            name="phoneNumber"
+            placeholder="Phone Number"
+            value={form.phoneNumber}
+            onChange={handleChange}
+            className="p-3 bg-gray-800 border border-gray-600 rounded"
             required
           />
-        </div>
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm">Upload Property Document</label>
           <input
-            type="file"
-            name="propertyDocument"
-            onChange={handleFileChange}
-            className="p-3 bg-gray-800 border border-gray-600 rounded text-white"
+            type="text"
+            name="state"
+            placeholder="State"
+            value={form.state}
+            onChange={handleChange}
+            className="p-3 bg-gray-800 border border-gray-600 rounded"
             required
           />
-        </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-        >
-          <FiUpload />
-          Submit Verification
-        </button>
-      </form>
+          <input
+            type="text"
+            name="district"
+            placeholder="District"
+            value={form.district}
+            onChange={handleChange}
+            className="p-3 bg-gray-800 border border-gray-600 rounded"
+            required
+          />
+
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            value={form.city}
+            onChange={handleChange}
+            className="p-3 bg-gray-800 border border-gray-600 rounded"
+            required
+          />
+
+          <div>
+            <label className="block text-sm mb-1">Upload Verification Document</label>
+            <input
+              type="file"
+              name="verificationDocuments"
+              onChange={handleFileChange}
+              className="p-2 bg-gray-800 border border-gray-600 rounded w-full"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            <FiUpload />
+            {submitting ? "Submitting..." : "Submit Verification"}
+          </button>
+        </form>
+      )}
     </div>
   );
 }

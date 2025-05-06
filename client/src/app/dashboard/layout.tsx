@@ -32,22 +32,24 @@ import {
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
+import Loading from "@/components/Loading";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
-  const { user, logout, isAuthenticated, isLoading } = useAuth();
+  const { user, logout, isAuthenticated, isLoading,setLoading } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/login");
+
     }
   }, [isAuthenticated, isLoading]);
 
   if (isLoading)
     return (
       <>
-        <p>Loading...</p>
+        <Loading/>
       </>
     );
   if (!isAuthenticated) return null; // Avoid rendering protected content while redirecting
