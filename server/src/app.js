@@ -11,9 +11,10 @@ const app = express()
 
 // Allow all origins (use with caution in production)
 app.use(cors({
-    origin: '*',  // Or use a specific domain here (e.g., 'http://localhost:3000')
+    origin: "http://localhost:3000",  // Or use a specific domain here (e.g., 'http://localhost:3000')
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
   }));
 
 app.use(express.json({limit: "16kb"}))

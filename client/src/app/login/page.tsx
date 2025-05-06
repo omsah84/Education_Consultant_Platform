@@ -10,7 +10,7 @@ export default function LoginPage() {
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
   const router = useRouter();
-  const { login } = useAuth();
+  const { login} = useAuth();
 
   const onSubmit = async (data: any) => {
     try {
@@ -18,14 +18,14 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       const result = await res.json();
-      console.log("Login Result:", result);
 
       if (res.ok) {
-        const { user, accessToken, refreshToken } = result.data;
-        login(user, accessToken, refreshToken); // store in context + localStorage
+        const { user,accessToken} = result.data;
+        login(user,accessToken); // store in context + localStorage
         router.push("/dashboard");
       } else {
         setError(result.message || "Login failed");

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { ReactNode, useState, useEffect } from 'react';
-import Link from 'next/link';
+import { ReactNode, useState, useEffect } from "react";
+import Link from "next/link";
 import {
   FiMenu,
   FiLogOut,
@@ -28,80 +28,273 @@ import {
   FiCalendar,
   FiThumbsUp,
   FiCreditCard,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, logout } = useAuth();
   const router = useRouter();
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!user) {
-      router.push('/login');
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
     }
-  }, [user]);
+  }, [isAuthenticated, isLoading]);
 
-  if (!user) return null; // Or a loading spinner
+  if (isLoading)
+    return (
+      <>
+        <p>Loading...</p>
+      </>
+    );
+  if (!isAuthenticated) return null; // Avoid rendering protected content while redirecting
 
   const menuItems = {
     tenant: [
-      { name: 'Home', path: '/dashboard', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Dashboard', path: '/dashboard/tenant', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'Search & Browse', path: '/dashboard/tenant/search', icon: <FiSearch className="text-white text-xl" /> },
-      { name: 'Verified Listings', path: '/dashboard/tenant/verified', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Chat with Host', path: '/dashboard/tenant/chat', icon: <FiMessageSquare className="text-white text-xl" /> },
-      { name: 'Schedule Visit', path: '/dashboard/tenant/schedule', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Upload KYC', path: '/dashboard/tenant/kyc', icon: <FiUpload className="text-white text-xl" /> },
-      { name: 'Book & Pay Rent', path: '/dashboard/tenant/book', icon: <FiBook className="text-white text-xl" /> },
-      { name: 'Track Move-in Status', path: '/dashboard/tenant/movein', icon: <FiBook className="text-white text-xl" /> },
-      { name: 'Give Review', path: '/dashboard/tenant/review', icon: <FiUser className="text-white text-xl" /> },
+      {
+        name: "Home",
+        path: "/dashboard",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Dashboard",
+        path: "/dashboard/tenant",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "Search & Browse",
+        path: "/dashboard/tenant/search",
+        icon: <FiSearch className="text-white text-xl" />,
+      },
+      {
+        name: "Verified Listings",
+        path: "/dashboard/tenant/verified",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Chat with Host",
+        path: "/dashboard/tenant/chat",
+        icon: <FiMessageSquare className="text-white text-xl" />,
+      },
+      {
+        name: "Schedule Visit",
+        path: "/dashboard/tenant/schedule",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Upload KYC",
+        path: "/dashboard/tenant/kyc",
+        icon: <FiUpload className="text-white text-xl" />,
+      },
+      {
+        name: "Book & Pay Rent",
+        path: "/dashboard/tenant/book",
+        icon: <FiBook className="text-white text-xl" />,
+      },
+      {
+        name: "Track Move-in Status",
+        path: "/dashboard/tenant/movein",
+        icon: <FiBook className="text-white text-xl" />,
+      },
+      {
+        name: "Give Review",
+        path: "/dashboard/tenant/review",
+        icon: <FiUser className="text-white text-xl" />,
+      },
       // Additional items
-      { name: 'Profile', path: '/dashboard/tenant/profile', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Payment History', path: '/dashboard/tenant/payments', icon: <FiCreditCard className="text-white text-xl" /> },
-      { name: 'Lease Agreement', path: '/dashboard/tenant/lease', icon: <FiFileText className="text-white text-xl" /> },
-      { name: 'Maintenance Requests', path: '/dashboard/tenant/maintenance', icon: <FiTool className="text-white text-xl" /> },
-      { name: 'Notifications', path: '/dashboard/tenant/notifications', icon: <FiBell className="text-white text-xl" /> },
-      { name: 'Rental History', path: '/dashboard/tenant/rent-history', icon: <FiCalendar className="text-white text-xl" /> },
-      { name: 'Tenant Support', path: '/dashboard/tenant/support', icon: <FiHelpCircle className="text-white text-xl" /> },
-      { name: 'Refer a Friend', path: '/dashboard/tenant/refer', icon: <FiShare className="text-white text-xl" /> },
-      { name: 'Messages', path: '/dashboard/tenant/messages', icon: <FiMail className="text-white text-xl" /> },
-      { name: 'Manage Feedback', path: '/dashboard/tenant/feedback', icon: <FiThumbsUp className="text-white text-xl" /> }
+      {
+        name: "Profile",
+        path: "/dashboard/tenant/profile",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Payment History",
+        path: "/dashboard/tenant/payments",
+        icon: <FiCreditCard className="text-white text-xl" />,
+      },
+      {
+        name: "Lease Agreement",
+        path: "/dashboard/tenant/lease",
+        icon: <FiFileText className="text-white text-xl" />,
+      },
+      {
+        name: "Maintenance Requests",
+        path: "/dashboard/tenant/maintenance",
+        icon: <FiTool className="text-white text-xl" />,
+      },
+      {
+        name: "Notifications",
+        path: "/dashboard/tenant/notifications",
+        icon: <FiBell className="text-white text-xl" />,
+      },
+      {
+        name: "Rental History",
+        path: "/dashboard/tenant/rent-history",
+        icon: <FiCalendar className="text-white text-xl" />,
+      },
+      {
+        name: "Tenant Support",
+        path: "/dashboard/tenant/support",
+        icon: <FiHelpCircle className="text-white text-xl" />,
+      },
+      {
+        name: "Refer a Friend",
+        path: "/dashboard/tenant/refer",
+        icon: <FiShare className="text-white text-xl" />,
+      },
+      {
+        name: "Messages",
+        path: "/dashboard/tenant/messages",
+        icon: <FiMail className="text-white text-xl" />,
+      },
+      {
+        name: "Manage Feedback",
+        path: "/dashboard/tenant/feedback",
+        icon: <FiThumbsUp className="text-white text-xl" />,
+      },
     ],
     host: [
-      { name: 'Home', path: '/dashboard', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Dashboard', path: '/dashboard/host', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'List Rooms/PG/Flats', path: '/dashboard/host/listings', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Verify Ownership', path: '/dashboard/host/verify', icon: <FiUpload className="text-white text-xl" /> },
-      { name: 'Tenant Inquiries', path: '/dashboard/host/inquiries', icon: <FiMessageSquare className="text-white text-xl" /> },
-      { name: 'Review Tenant ID', path: '/dashboard/host/reviews', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Accept/Reject Bookings', path: '/dashboard/host/accept', icon: <FiBook className="text-white text-xl" /> },
-      { name: 'Receive Payments', path: '/dashboard/host/payments', icon: <FiBook className="text-white text-xl" /> },
-      { name: 'Track Bookings & Availability', path: '/dashboard/host/bookings', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'View Analytics & Feedback', path: '/dashboard/host/analytics', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'Profile', path: '/dashboard/host/profile', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Notifications', path: '/dashboard/host/notifications', icon: <FiBell className="text-white text-xl" /> },
-      { name: 'Help & Support', path: '/dashboard/host/support', icon: <FiHelpCircle className="text-white text-xl" /> },
-      { name: 'Settings', path: '/dashboard/host/settings', icon: <FiSettings className="text-white text-xl" /> },
-      { name: 'Messages', path: '/dashboard/host/messages', icon: <FiMail className="text-white text-xl" /> },
-      { name: 'Booking History', path: '/dashboard/host/booking-history', icon: <FiCalendar className="text-white text-xl" /> },
-      { name: 'Manage Feedback', path: '/dashboard/host/feedback', icon: <FiThumbsUp className="text-white text-xl" /> },
-      { name: 'Billing', path: '/dashboard/host/billing', icon: <FiCreditCard className="text-white text-xl" /> }
-    ],    
-   
+      {
+        name: "Home",
+        path: "/dashboard",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Dashboard",
+        path: "/dashboard/host",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "List Rooms/PG/Flats",
+        path: "/dashboard/host/listings",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Verify Ownership",
+        path: "/dashboard/host/verify",
+        icon: <FiUpload className="text-white text-xl" />,
+      },
+      {
+        name: "Tenant Inquiries",
+        path: "/dashboard/host/inquiries",
+        icon: <FiMessageSquare className="text-white text-xl" />,
+      },
+      {
+        name: "Review Tenant ID",
+        path: "/dashboard/host/reviews",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Accept/Reject Bookings",
+        path: "/dashboard/host/accept",
+        icon: <FiBook className="text-white text-xl" />,
+      },
+      {
+        name: "Receive Payments",
+        path: "/dashboard/host/payments",
+        icon: <FiBook className="text-white text-xl" />,
+      },
+      {
+        name: "Track Bookings & Availability",
+        path: "/dashboard/host/bookings",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "View Analytics & Feedback",
+        path: "/dashboard/host/analytics",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "Profile",
+        path: "/dashboard/host/profile",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Notifications",
+        path: "/dashboard/host/notifications",
+        icon: <FiBell className="text-white text-xl" />,
+      },
+      {
+        name: "Help & Support",
+        path: "/dashboard/host/support",
+        icon: <FiHelpCircle className="text-white text-xl" />,
+      },
+      {
+        name: "Settings",
+        path: "/dashboard/host/settings",
+        icon: <FiSettings className="text-white text-xl" />,
+      },
+      {
+        name: "Messages",
+        path: "/dashboard/host/messages",
+        icon: <FiMail className="text-white text-xl" />,
+      },
+      {
+        name: "Booking History",
+        path: "/dashboard/host/booking-history",
+        icon: <FiCalendar className="text-white text-xl" />,
+      },
+      {
+        name: "Manage Feedback",
+        path: "/dashboard/host/feedback",
+        icon: <FiThumbsUp className="text-white text-xl" />,
+      },
+      {
+        name: "Billing",
+        path: "/dashboard/host/billing",
+        icon: <FiCreditCard className="text-white text-xl" />,
+      },
+    ],
+
     admin: [
-      { name: 'Home', path: '/dashboard', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Dashboard', path: '/dashboard/admin', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'Verify Host Profiles', path: '/dashboard/admin/verify', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Monitor Activity', path: '/dashboard/admin/activity', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'Manage Listings', path: '/dashboard/admin/listings', icon: <FiHome className="text-white text-xl" /> },
-      { name: 'Handle Support/Disputes', path: '/dashboard/admin/support', icon: <FiMessageSquare className="text-white text-xl" /> },
-      { name: 'Send Platform Updates', path: '/dashboard/admin/updates', icon: <FiUser className="text-white text-xl" /> },
-      { name: 'Manage Revenue Dashboards', path: '/dashboard/admin/revenue', icon: <FiBarChart className="text-white text-xl" /> },
-      { name: 'Manage Subscription Plans', path: '/dashboard/admin/plans', icon: <FiBook className="text-white text-xl" /> },
+      {
+        name: "Home",
+        path: "/dashboard",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Dashboard",
+        path: "/dashboard/admin",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "Verify Host Profiles",
+        path: "/dashboard/admin/verify",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Monitor Activity",
+        path: "/dashboard/admin/activity",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "Manage Listings",
+        path: "/dashboard/admin/listings",
+        icon: <FiHome className="text-white text-xl" />,
+      },
+      {
+        name: "Handle Support/Disputes",
+        path: "/dashboard/admin/support",
+        icon: <FiMessageSquare className="text-white text-xl" />,
+      },
+      {
+        name: "Send Platform Updates",
+        path: "/dashboard/admin/updates",
+        icon: <FiUser className="text-white text-xl" />,
+      },
+      {
+        name: "Manage Revenue Dashboards",
+        path: "/dashboard/admin/revenue",
+        icon: <FiBarChart className="text-white text-xl" />,
+      },
+      {
+        name: "Manage Subscription Plans",
+        path: "/dashboard/admin/plans",
+        icon: <FiBook className="text-white text-xl" />,
+      },
     ],
   };
 
@@ -148,7 +341,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         {/* Sidebar */}
         <div
           className={`bg-gray-800 w-64 p-4 transition-transform transform fixed top-16 left-0 h-[calc(100vh-4rem)] z-20 flex flex-col ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } sm:translate-x-0`}
         >
           <div className="overflow-y-auto flex-1 custom-scrollbar">

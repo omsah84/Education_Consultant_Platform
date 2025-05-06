@@ -1,17 +1,27 @@
 'use client';
-
-import { useAuth } from "@/lib/AuthContext";
 import { FiBarChart, FiUser, FiHome, FiMessageSquare, FiBell, FiSearch, FiCalendar, FiUpload, FiFileText } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/AuthContext";
+import { useEffect } from 'react';
+
 
 const TenantDashboard = () => {
   const router = useRouter();
-  const { user } = useAuth(); // Fetch user from context or any other state management
-
-  // Make sure user data is loaded
-  if (!user) {
-    return <div className="text-white p-6">Loading user...</div>;
-  }
+    const { user, logout, isAuthenticated, isLoading } = useAuth();
+  
+    useEffect(() => {
+      if (!isLoading && !isAuthenticated) {
+        router.push("/login");
+      }
+    }, [isAuthenticated, isLoading]);
+  
+    if (isLoading)
+      return (
+        <>
+          <p>Loading...</p>
+        </>
+      );
+    if (!isAuthenticated) return null; // Avoid rendering protected content while redirecting
 
   return (
     <div className="p-6 text-white">
