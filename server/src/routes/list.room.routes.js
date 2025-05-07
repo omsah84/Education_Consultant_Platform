@@ -2,12 +2,13 @@ import express from 'express';
 import {
   createRoomListing,
   getMyRoomListings,
-  approveRoomListing,
-  rejectRoomListing,
+  // approveRoomListing,
+  // rejectRoomListing,
 } from '../controllers/list.room.controller.js'; // Import your room controller
 import { verifyJWT } from '../middlewares/auth.middleware.js'; // JWT verification middleware
 import { upload } from '../middlewares/multer.middleware.js'; // Multer for file uploads
-
+import {  searchRoomListings} from "../controllers/search.room.controller.js"
+import { requestRoomBooking,getRoomDetails,getUserBookingRequests } from '../controllers/request.room.booking.controller.js';
 const router = express.Router();
 
 // ==================== USER ROUTES ====================
@@ -22,6 +23,10 @@ router.post('/room-listing', upload.fields([
 ]), createRoomListing); // Create room listing with multiple images
 
 router.get('/room-listings', getMyRoomListings); // Get current user's room listings
+router.get('/search', searchRoomListings); // Get current user's room listings
+router.post('/request-booking', requestRoomBooking);
+router.get('/my-booking-requests', getUserBookingRequests);
+router.get('/:roomId', getRoomDetails);
 
 // ==================== ADMIN ROUTES ====================
 // 🛡️ Admin can approve or reject a specific room listing

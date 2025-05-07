@@ -44,6 +44,7 @@ app.use("/api/v1/owner", ownerRouter)
 app.use("/api/v1/listproperty", listProperty)
 app.use("/api/v1/room", listRoom)
 
+
 // app.use("/api/v1/tweets", tweetRouter)
 // app.use("/api/v1/subscriptions", subscriptionRouter)
 // app.use("/api/v1/videos", videoRouter)

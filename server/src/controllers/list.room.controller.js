@@ -43,21 +43,6 @@ export const createRoomListing = async (req, res) => {
   }
 };
 
-// Get current user's room listings
-// export const getMyRoomListings = async (req, res) => {
-//   try {
-//     const roomListings = await ListRoom.find({ usernameId: req.user._id });
-//     // console.log(roomListings)
-
-//     if (!roomListings || roomListings.length === 0) {
-//       return res.status(404).json({ success: false, message: 'No room listings found' });
-//     }
-
-//     res.status(200).json({ success: true, data: roomListings });
-//   } catch (err) {
-//     res.status(500).json({ success: false, message: err.message });
-//   }
-// };
 
 // Get current user's room listings with merged property data
 export const getMyRoomListings = async (req, res) => {
@@ -110,7 +95,33 @@ export const getMyRoomListings = async (req, res) => {
       res.status(500).json({ success: false, message: err.message });
     }
   };
+
+
+
+ 
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Admin: Approve a room listing
 export const approveRoomListing = async (req, res) => {
