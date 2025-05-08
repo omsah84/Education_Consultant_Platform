@@ -1,112 +1,110 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { FiCheckCircle, FiXCircle, FiCalendar, FiEye } from 'react-icons/fi';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApi } from "@/lib/useApi";
+import { useAuth } from "@/lib/AuthContext";
 
-const bookings = [
-  {
-    id: 1,
-    tenantName: 'John Doe',
-    listingTitle: '2BHK Flat in Sector 62',
-    bookingDate: '2025-05-10',
-    status: 'Confirmed',
-    checkInDate: '2025-05-15',
-    checkOutDate: '2025-05-30',
-  },
-  {
-    id: 2,
-    tenantName: 'Jane Smith',
-    listingTitle: 'Shared Room for Students',
-    bookingDate: '2025-04-28',
-    status: 'Pending',
-    checkInDate: '2025-05-05',
-    checkOutDate: '2025-05-20',
-  },
-];
+interface Room {
+  roomId: string;
+  roomPricePerMonth: number;
+  roomType: string;
+  roomStatus: string;
+  propertyType: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+}
 
-export default function TrackBookingsPage() {
+export default function ConfirmedBookingsPage() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const api = useApi();
   const router = useRouter();
-  const [bookingList, setBookingList] = useState(bookings);
 
-  const handleBookingConfirm = (bookingId: number) => {
-    setBookingList((prev) =>
-      prev.map((booking) =>
-        booking.id === bookingId ? { ...booking, status: 'Confirmed' } : booking
-      )
-    );
-  };
+  const [confirmedList, setConfirmedList] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleBookingCancel = (bookingId: number) => {
-    setBookingList((prev) =>
-      prev.map((booking) =>
-        booking.id === bookingId ? { ...booking, status: 'Cancelled' } : booking
-      )
-    );
-  };
+  useEffect(() => {
+    if (!isAuthenticated && !authLoading) {
+      router.push("/login");
+      return;
+    }
 
-  const handleViewDetails = (bookingId: number) => {
-    // Navigate to a detailed page to view the booking details
-    router.push(`/dashboard/host/bookings/view/${bookingId}`);
+    if (isAuthenticated && !authLoading) {
+      fetchConfirmedBookings();
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  const fetchConfirmedBookings = async () => {
+    setLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const res = await api.get("/room/confirmed-room");
+      setConfirmedList(res.data.data || []);
+    } catch (err: any) {
+      setErrorMessage(
+        err?.response?.data?.message ||
+          "An error occurred while fetching confirmed bookings."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="p-6 text-white">
-      <h1 className="text-2xl font-bold mb-6">Track Bookings & Availability</h1>
+      <h1 className="text-2xl font-bold mb-6">Confirmed Bookings</h1>
 
-      <div className="grid gap-6">
-        {bookingList.map((booking) => (
-          <div key={booking.id} className="bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition p-4">
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold">{booking.tenantName}</h3>
-              <p className="text-sm text-gray-400">Booking Date: {booking.bookingDate}</p>
-            </div>
-            <p className="text-sm text-gray-400 mb-3">Listing: {booking.listingTitle}</p>
-            <p className="text-sm text-gray-400 mb-3">Check-In Date: {booking.checkInDate}</p>
-            <p className="text-sm text-gray-400 mb-3">Check-Out Date: {booking.checkOutDate}</p>
+      {loading && <p className="text-gray-400">Loading confirmed rooms...</p>}
 
-            <div className="flex justify-between items-center">
-              <p
-                className={`text-sm font-medium ${
-                  booking.status === 'Pending' ? 'text-yellow-400' : booking.status === 'Confirmed' ? 'text-green-400' : 'text-red-400'
-                }`}
-              >
-                Status: {booking.status}
+      {!loading && errorMessage && (
+        <div className="bg-red-900/30 border border-red-700 rounded-lg p-4 mb-4">
+          <p className="text-red-400">{errorMessage}</p>
+        </div>
+      )}
+
+      {!loading && !errorMessage && confirmedList.length === 0 && (
+        <p className="text-gray-400">No confirmed bookings found.</p>
+      )}
+
+      {!loading && confirmedList.length > 0 && (
+        <div className="grid gap-6">
+          {confirmedList.map((room) => (
+            <div
+              key={room.roomId}
+              className="bg-gray-800 rounded-lg shadow hover:bg-gray-700 transition p-4"
+            >
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold">
+                  Room Type: {room.roomType}
+                </h3>
+                <p className="text-sm text-gray-400">
+                  ₹{room.roomPricePerMonth}/month
+                </p>
+              </div>
+
+              <p className="text-sm text-gray-400 mb-2">
+                Listing: {room.propertyType}
               </p>
 
-              <div className="flex gap-3">
-                {booking.status === 'Pending' && (
-                  <button
-                    onClick={() => handleBookingConfirm(booking.id)}
-                    className="text-green-400 hover:text-green-300 flex items-center gap-1"
-                  >
-                    <FiCheckCircle />
-                    Confirm Booking
-                  </button>
-                )}
+              <p className="text-sm text-gray-400 mb-2">
+                Address: {room.address.street}, {room.address.city},{" "}
+                {room.address.state} - {room.address.postalCode}
+              </p>
 
-                {booking.status !== 'Cancelled' && (
-                  <button
-                    onClick={() => handleBookingCancel(booking.id)}
-                    className="text-red-400 hover:text-red-300 flex items-center gap-1"
-                  >
-                    <FiXCircle />
-                    Cancel Booking
-                  </button>
-                )}
-
-                <button
-                  onClick={() => handleViewDetails(booking.id)}
-                  className="text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                >
-                  <FiEye />
-                  View Details
-                </button>
-              </div>
+              <p className="text-green-400 font-medium text-sm">
+                Status: {room.roomStatus}
+              </p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

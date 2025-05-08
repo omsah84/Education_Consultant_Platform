@@ -11,6 +11,7 @@ export const useApi = () => {
   });
 
   api.interceptors.request.use((config) => {
+    
     if (accessToken) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
@@ -20,6 +21,7 @@ export const useApi = () => {
   api.interceptors.response.use(
     (res) => res,
     async (error) => {
+      
       const originalRequest = error.config;
 
       if (error.response?.status === 401 && !originalRequest._retry) {
@@ -34,7 +36,6 @@ export const useApi = () => {
           logout();
         }
       }
-
       return Promise.reject(error);
     }
   );

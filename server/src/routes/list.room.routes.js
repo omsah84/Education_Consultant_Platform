@@ -2,13 +2,19 @@ import express from 'express';
 import {
   createRoomListing,
   getMyRoomListings,
+  getMyRequestedRoomListings,
+  acceptBooking,
+  rejectBooking,
+  getMyConfirmedRoomListings
   // approveRoomListing,
   // rejectRoomListing,
 } from '../controllers/list.room.controller.js'; // Import your room controller
 import { verifyJWT } from '../middlewares/auth.middleware.js'; // JWT verification middleware
 import { upload } from '../middlewares/multer.middleware.js'; // Multer for file uploads
 import {  searchRoomListings} from "../controllers/search.room.controller.js"
-import { requestRoomBooking,getRoomDetails,getUserBookingRequests } from '../controllers/request.room.booking.controller.js';
+import { requestRoomBooking,getRoomDetails,getUserBookingRequests,getInProgressBookingRequests ,cancelBooking} from '../controllers/request.room.booking.controller.js';
+
+import { markBookingAsConfirmed } from '../controllers/room.book.controller.js';
 const router = express.Router();
 
 // ==================== USER ROUTES ====================
@@ -25,7 +31,14 @@ router.post('/room-listing', upload.fields([
 router.get('/room-listings', getMyRoomListings); // Get current user's room listings
 router.get('/search', searchRoomListings); // Get current user's room listings
 router.post('/request-booking', requestRoomBooking);
+router.get('/requested-room', getMyRequestedRoomListings);
+router.get('/confirmed-room',getMyConfirmedRoomListings);
+router.post('/accept-booking', acceptBooking);
+router.post('/reject-booking', rejectBooking);
 router.get('/my-booking-requests', getUserBookingRequests);
+router.get('/my-booking-requests/in-progress', getInProgressBookingRequests);
+router.post('/cancel-booking/:bookingId', cancelBooking);
+router.post('/mark-as-confirmed/:bookingId', markBookingAsConfirmed);
 router.get('/:roomId', getRoomDetails);
 
 // ==================== ADMIN ROUTES ====================

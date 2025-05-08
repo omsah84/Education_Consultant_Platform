@@ -24,7 +24,7 @@ const roomSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Available", "Booked", "In Progress","Requested"],
+      enum: ["Available", "Booked", "In Progress","Requested","Confirmed"],
       default: "Available",
     },
 
@@ -84,13 +84,11 @@ const roomSchema = new mongoose.Schema(
       default: [],
     },
 
-    likedByUsers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
+    bookedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+   
     images: [
       {
         type: String, // URL to Cloudinary or other CDN

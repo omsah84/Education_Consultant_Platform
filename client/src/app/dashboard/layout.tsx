@@ -77,6 +77,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         disabled: false,
       },
       {
+        name: "In Progress Bookings",
+        path: "/dashboard/tenant/in-progress",
+        icon: <FiClock className="text-white text-xl" />, // Icon indicating "in progress" or ongoing
+        disabled: false,
+      },
+      {
         name: "Verified Listings",
         path: "/dashboard/tenant/verified",
         icon: <FiHome className="text-white text-xl" />,
