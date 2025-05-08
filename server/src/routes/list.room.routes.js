@@ -5,14 +5,17 @@ import {
   getMyRequestedRoomListings,
   acceptBooking,
   rejectBooking,
-  getMyConfirmedRoomListings
+  getMyConfirmedRoomListings,
+  getMyApprovedRoomListings,
+  approveBooking,
+  getBookingStatusForHost ,
   // approveRoomListing,
   // rejectRoomListing,
 } from '../controllers/list.room.controller.js'; // Import your room controller
 import { verifyJWT } from '../middlewares/auth.middleware.js'; // JWT verification middleware
 import { upload } from '../middlewares/multer.middleware.js'; // Multer for file uploads
 import {  searchRoomListings} from "../controllers/search.room.controller.js"
-import { requestRoomBooking,getRoomDetails,getUserBookingRequests,getInProgressBookingRequests ,cancelBooking} from '../controllers/request.room.booking.controller.js';
+import { requestRoomBooking,getRoomDetails,getUserBookingRequests,getInProgressBookingRequests , getApprovedBookingRequests, cancelBooking, getBookingStatusForTenant} from '../controllers/request.room.booking.controller.js';
 
 import { markBookingAsConfirmed } from '../controllers/room.book.controller.js';
 const router = express.Router();
@@ -33,13 +36,20 @@ router.get('/search', searchRoomListings); // Get current user's room listings
 router.post('/request-booking', requestRoomBooking);
 router.get('/requested-room', getMyRequestedRoomListings);
 router.get('/confirmed-room',getMyConfirmedRoomListings);
+router.get('/approved-room',getMyApprovedRoomListings);
 router.post('/accept-booking', acceptBooking);
 router.post('/reject-booking', rejectBooking);
+router.post('/approve-booking', approveBooking);
 router.get('/my-booking-requests', getUserBookingRequests);
 router.get('/my-booking-requests/in-progress', getInProgressBookingRequests);
+router.get('/my-booking-requests/in-approvel', getApprovedBookingRequests);
 router.post('/cancel-booking/:bookingId', cancelBooking);
 router.post('/mark-as-confirmed/:bookingId', markBookingAsConfirmed);
 router.get('/:roomId', getRoomDetails);
+router.get('/tenant/movein-status',getBookingStatusForTenant)
+router.get('/host/movein-status',getBookingStatusForHost)
+
+
 
 // ==================== ADMIN ROUTES ====================
 // 🛡️ Admin can approve or reject a specific room listing

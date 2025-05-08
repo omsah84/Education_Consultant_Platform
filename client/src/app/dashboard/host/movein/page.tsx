@@ -15,7 +15,7 @@ const TrackMoveInStatusPage = () => {
   useEffect(() => {
     const fetchMoveInStatus = async () => {
       try {
-        const response = await api.get('/room/tenant/movein-status');
+        const response = await api.get('/room/host/movein-status');
         setMoveInData(response.data.data || []);
       } catch (err) {
         setError('Failed to fetch move-in status. Please try again later.');
@@ -51,37 +51,32 @@ const TrackMoveInStatusPage = () => {
 
   return (
     <div className="p-6 sm:p-12 text-white">
-      <h1 className="text-2xl sm:text-4xl font-bold mb-6  text-gray-100">Track Move-in Status</h1>
+      <h1 className="text-2xl sm:text-4xl font-bold mb-6 text-gray-100">Track Move-in Status</h1>
 
       {moveInData.map((item, index) => (
         <div
           key={index}
-          className="bg-gray-800 rounded-lg p-4 mb-6 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer w-full sm:w-4/4 mx-auto"
+          className="bg-gray-800 rounded-lg p-4 mb-6 shadow-lg hover:shadow-2xl transition-shadow cursor-pointer"
           onClick={() => openModal(item)}
         >
-          {/* Property Info */}
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4 text-gray-200">{item.roomDetails?.type || 'Room'}</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-2 text-gray-200">{item.roomDetails?.type || 'Room'}</h2>
           <p className="text-lg text-gray-400">💰 ₹{item.roomDetails?.pricePerMonth}</p>
           <p className="text-lg text-gray-400">📍 {item.roomAddress?.streetAddress}, {item.roomAddress?.city}</p>
           <p className="text-lg text-gray-400">🌐 {item.roomAddress?.country}</p>
 
-          {/* Booking Request Information */}
-          <p className="text-lg text-gray-400">🗓️ Booking Date: {new Date(item.roomBookingPayment?.bookingDate).toLocaleDateString()}</p>
-          <p className="text-lg text-gray-400">💳 Payment Method: {item.roomBookingPayment?.paymentMethod}</p>
-          <p className="text-lg text-gray-400">📦 Payment Status: {item.roomBookingPayment?.status}</p>
+          <p className="text-lg text-gray-400">🗓️ Booking Date: {item.paymentDetails?.bookingDate ? new Date(item.paymentDetails.bookingDate).toLocaleDateString() : 'N/A'}</p>
+          <p className="text-lg text-gray-400">💳 Payment Method: {item.paymentDetails?.paymentMethod}</p>
+          <p className="text-lg text-gray-400">📦 Payment Status: {item.paymentDetails?.status}</p>
 
-          {/* Booking Request Details */}
-          <p className="text-lg text-gray-400">👤 Booked By: {item.bookingRequest?.bookedByName}</p>
-          <p className="text-lg text-gray-400">👥 Provider: {item.bookingRequest?.providerName}</p>
-          <p className="text-lg text-gray-400">📅 Booking Request Status: {item.bookingRequest?.status}</p>
-          <p className="text-lg text-gray-400">🕰️ Booking Created At: {new Date(item.bookingRequest?.createdAt).toLocaleString()}</p>
+          <p className="text-lg text-gray-400">👤 Booked By: {item.bookerDetails?.fullName}</p>
+          <p className="text-lg text-gray-400">👥 Provider: {item.hostDetails?.fullName}</p>
+          <p className="text-lg text-gray-400">📅 Booking Request Status: {item.bookingRequestStatus}</p>
 
-          {/* Move-in Status Icon */}
           <div className="flex items-center gap-3 mt-4">
-            {item.bookingRequest?.status === 'Pending' && <FiClock className="text-yellow-400 text-2xl" />}
-            {item.bookingRequest?.status === 'Approved' && <FiCheckCircle className="text-green-400 text-2xl" />}
-            {item.bookingRequest?.status === 'In Progress' && <FiHome className="text-blue-400 text-2xl" />}
-            <span className="text-xl font-semibold text-gray-200">Status: {item.bookingRequest?.status}</span>
+            {item.bookingRequestStatus === 'Pending' && <FiClock className="text-yellow-400 text-2xl" />}
+            {item.bookingRequestStatus === 'Approved' && <FiCheckCircle className="text-green-400 text-2xl" />}
+            {item.bookingRequestStatus === 'In Progress' && <FiHome className="text-blue-400 text-2xl" />}
+            <span className="text-xl font-semibold text-gray-200">Status: {item.bookingRequestStatus}</span>
           </div>
         </div>
       ))}
@@ -91,23 +86,20 @@ const TrackMoveInStatusPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-8 rounded-lg w-full sm:w-2/3 max-w-4xl text-white">
             <h2 className="text-3xl font-bold mb-6 text-gray-100">Booking Details</h2>
-            
-            {/* Modal Content */}
+
             <p className="text-lg text-gray-300">💰 ₹{selectedItem.roomDetails?.pricePerMonth}</p>
             <p className="text-lg text-gray-300">📝 Description: {selectedItem.roomDetails?.description || 'No description available'}</p>
             <p className="text-lg text-gray-300">📍 Address: {selectedItem.roomAddress?.streetAddress}, {selectedItem.roomAddress?.city}</p>
             <p className="text-lg text-gray-300">🌐 {selectedItem.roomAddress?.country}</p>
 
-            <p className="text-lg text-gray-300">🗓️ Booking Date: {new Date(selectedItem.roomBookingPayment?.bookingDate).toLocaleDateString()}</p>
-            <p className="text-lg text-gray-300">💳 Payment Method: {selectedItem.roomBookingPayment?.paymentMethod}</p>
-            <p className="text-lg text-gray-300">📦 Payment Status: {selectedItem.roomBookingPayment?.status}</p>
+            <p className="text-lg text-gray-300">🗓️ Booking Date: {selectedItem.paymentDetails?.bookingDate ? new Date(selectedItem.paymentDetails.bookingDate).toLocaleDateString() : 'N/A'}</p>
+            <p className="text-lg text-gray-300">💳 Payment Method: {selectedItem.paymentDetails?.paymentMethod}</p>
+            <p className="text-lg text-gray-300">📦 Payment Status: {selectedItem.paymentDetails?.status}</p>
 
-            <p className="text-lg text-gray-300">👤 Booked By: {selectedItem.bookingRequest?.bookedByName}</p>
-            <p className="text-lg text-gray-300">👥 Provider: {selectedItem.bookingRequest?.providerName}</p>
-            <p className="text-lg text-gray-300">📅 Booking Request Status: {selectedItem.bookingRequest?.status}</p>
-            <p className="text-lg text-gray-300">🕰️ Created At: {new Date(selectedItem.bookingRequest?.createdAt).toLocaleString()}</p>
+            <p className="text-lg text-gray-300">👤 Booked By: {selectedItem.bookerDetails?.fullName}</p>
+            <p className="text-lg text-gray-300">👥 Provider: {selectedItem.hostDetails?.fullName}</p>
+            <p className="text-lg text-gray-300">📅 Booking Request Status: {selectedItem.bookingRequestStatus}</p>
 
-            {/* Close Modal Button */}
             <button
               onClick={closeModal}
               className="mt-6 bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-700 focus:outline-none"

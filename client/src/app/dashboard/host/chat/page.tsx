@@ -12,7 +12,7 @@ interface Message {
   timestamp: string;
 }
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'; // Set via env
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
 
 const Chat = ({ hostId }: { hostId: string }) => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -24,14 +24,12 @@ const Chat = ({ hostId }: { hostId: string }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect unauthenticated users
   useEffect(() => {
     if (!isAuthenticated && !authLoading) {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // Init socket and listeners
   useEffect(() => {
     if (!user?.id || !hostId) return;
 
@@ -74,24 +72,26 @@ const Chat = ({ hostId }: { hostId: string }) => {
   };
 
   return (
-    <div className="flex flex-col p-6 bg-gray-100 min-h-screen">
+    <div className="flex flex-col p-6 min-h-screen bg-black text-white">
       <h2 className="text-2xl font-bold mb-4">Chat Room</h2>
 
-      <div className="flex-1 overflow-y-auto bg-white p-4 rounded-lg shadow-lg mb-4">
+      <div className="flex-1 overflow-y-auto bg-neutral-900 p-4 rounded-lg shadow-inner mb-4">
         {loading ? (
-          <p className="text-gray-500">Loading messages...</p>
+          <p className="text-gray-400">Loading messages...</p>
         ) : messages.length === 0 ? (
-          <p className="text-gray-400">No messages yet.</p>
+          <p className="text-gray-500">No messages yet.</p>
         ) : (
           messages.map((msg, idx) => (
             <div
               key={idx}
-              className={`mb-3 p-3 rounded-lg ${
-                msg.senderId === user?.id ? 'bg-blue-100 text-right' : 'bg-gray-200 text-left'
+              className={`mb-3 p-3 rounded-lg max-w-[75%] ${
+                msg.senderId === user?.id
+                  ? 'bg-blue-600 ml-auto text-right'
+                  : 'bg-gray-700 mr-auto text-left'
               }`}
             >
               <p className="text-sm">{msg.message}</p>
-              <small className="text-xs text-gray-500 block">
+              <small className="text-xs text-gray-300 block mt-1">
                 {new Date(msg.timestamp).toLocaleString()}
               </small>
             </div>
@@ -104,7 +104,7 @@ const Chat = ({ hostId }: { hostId: string }) => {
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 p-3 border border-gray-300 rounded-l-lg"
+          className="flex-1 p-3 bg-gray-800 text-white border border-gray-700 rounded-l-lg placeholder-gray-400 focus:outline-none"
           placeholder="Type your message..."
         />
         <button

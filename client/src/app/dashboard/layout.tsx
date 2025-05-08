@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   FiMenu,
   FiLogOut,
+  FiCheckCircle,
   FiHome,
   FiClipboard,
   FiSearch,
@@ -81,14 +82,32 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         path: "/dashboard/tenant/in-progress",
         icon: <FiClock className="text-white text-xl" />, // Icon indicating "in progress" or ongoing
         disabled: false,
+      },{
+        name: "Approved Bookings",
+        path: "/dashboard/tenant/approved",
+        icon: <FiCheckCircle className="text-white text-xl" />, // Icon indicating approval or success
+        disabled: false,
+      },
+      {
+        name: "Track Move-in Status",
+        path: "/dashboard/tenant/movein",
+        icon: <FiBook className="text-white text-xl" />,
+        disabled: false,
       },
       {
         name: "Verified Listings",
         path: "/dashboard/tenant/verified",
         icon: <FiHome className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
-      
+
+      {
+        name: "Upload KYC",
+        path: "/dashboard/tenant/kyc",
+        icon: <FiUpload className="text-white text-xl" />,
+        disabled: true,
+      },
+  
       {
         name: "Chat with Host",
         path: "/dashboard/tenant/chat",
@@ -99,67 +118,57 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         name: "Schedule Visit",
         path: "/dashboard/tenant/schedule",
         icon: <FiUser className="text-white text-xl" />,
-        disabled: false,
-      },
-      {
-        name: "Upload KYC",
-        path: "/dashboard/tenant/kyc",
-        icon: <FiUpload className="text-white text-xl" />,
         disabled: true,
       },
+     
       {
         name: "Book & Pay Rent",
         path: "/dashboard/tenant/book",
         icon: <FiBook className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
-      {
-        name: "Track Move-in Status",
-        path: "/dashboard/tenant/movein",
-        icon: <FiBook className="text-white text-xl" />,
-        disabled: false,
-      },
+
       {
         name: "Give Review",
         path: "/dashboard/tenant/review",
         icon: <FiUser className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Profile",
         path: "/dashboard/tenant/profile",
         icon: <FiUser className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Payment History",
         path: "/dashboard/tenant/payments",
         icon: <FiCreditCard className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Lease Agreement",
         path: "/dashboard/tenant/lease",
         icon: <FiFileText className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Maintenance Requests",
         path: "/dashboard/tenant/maintenance",
         icon: <FiTool className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Notifications",
         path: "/dashboard/tenant/notifications",
         icon: <FiBell className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Rental History",
         path: "/dashboard/tenant/rent-history",
         icon: <FiCalendar className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Tenant Support",
@@ -177,13 +186,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         name: "Messages",
         path: "/dashboard/tenant/messages",
         icon: <FiMail className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Manage Feedback",
         path: "/dashboard/tenant/feedback",
         icon: <FiThumbsUp className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
     ],
     host: [
@@ -230,16 +239,35 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         disabled: false,
       },
       {
-        name: "Track Bookings & Availability",
-        path: "/dashboard/host/bookings",
-        icon: <FiBarChart className="text-white text-xl" />,
+        name: "Confirmed Bookings",
+        path: "/dashboard/host/confirmed",
+        icon: <FiCheckCircle className="text-white text-xl" />,
+        disabled: false,
+      },
+      {
+        name: "Approved Bookings",
+        path: "/dashboard/host/approved",
+        icon: <FiThumbsUp className="text-white text-xl" />,
+        disabled: false,
+      },
+      {
+        name: "Track Move-in Status",
+        path: "/dashboard/host/movein",
+        icon: <FiBook className="text-white text-xl" />,
+        disabled: false,
+      },
+
+      {
+        name: "Chat with Tenant",
+        path: "/dashboard/host/chat",
+        icon: <FiMessageSquare className="text-white text-xl" />,
         disabled: false,
       },
       {
         name: "Booking History",
         path: "/dashboard/host/booking-history",
         icon: <FiCalendar className="text-white text-xl" />,
-        disabled: false,
+        disabled: true,
       },
       {
         name: "Tenant Inquiries",
